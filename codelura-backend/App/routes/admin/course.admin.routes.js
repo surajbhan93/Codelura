@@ -37,6 +37,7 @@
 import express from "express";
 import {
   uploadCourse,
+  updateCourse,
   deleteCourse,
   togglePublishCourse
 } from "../../controllers/admin/course.admin.controller.js";
@@ -60,6 +61,18 @@ router.post(
   uploadCourse
 );
 
+router.patch(
+  "/courses/:id",
+  authMiddleware,
+  adminOnly,
+  upload.fields([
+    { name: "pdf", maxCount: 1 },
+    { name: "banner", maxCount: 1 },
+    { name: "attachments", maxCount: 5 }
+  ]),
+  updateCourse
+);
+
 router.delete(
   "/courses/:id",
   authMiddleware,
@@ -73,5 +86,6 @@ router.patch(
   adminOnly,
   togglePublishCourse
 );
+
 
 export default router;

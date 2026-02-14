@@ -122,3 +122,75 @@ export const togglePublishCourse = async (req, res) => {
     isPublished: course.isPublished
   });
 };
+
+/**
+ * ===============================
+ * ADMIN: UPDATE COURSE
+ * ===============================
+ * PATCH /api/admin/courses/:id
+ */
+export const updateCourse = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const updates = req.body;
+
+    const course = await Course.findById(id);
+    if (!course) {
+      return res.status(404).json({ message: "Course not found" });
+    }
+
+    // 🔗 Slug logic (only if title changes)
+    if (updates.title && updates.title !== course.title) {
+      updates.slug = slugify(updates.title, { lower: true });
+    }
+
+    // Handle price/isPaid logic
+    if (updates.price !== undefined) {
+      updates.price = Number(updates.price);
+      updates.isPaid = updates.price > 0;
+    }
+
+    // File updates (handled in route if new files uploaded)
+    if (req.files) {
+      if (req.files.pdf) {
+        updates.pdf = {
+          fileName: req.files.pdf[0].originalname,
+          filePath: req.files.pdf[0].path,
+          fileSize: req.files.pdf[0].size
+        };
+      }
+      if (req.files.banner) {
+        updates.bannerImage = {
+          fileName: req.files.banner[0].originalname,
+          filePath: req.files.banner[0].path,
+          fileSize: req.files.banner[0].size
+        };
+      }
+      if (req.files.attachments) {
+        updates.attachments = req.files.attachments.map((f) => ({
+          fileName: f.originalname,
+          filePath: f.path,
+          fileSize: f.size,
+          fileType: f.mimetype.includes("excel") ? "excel" : "other"
+        }));
+      }
+    }
+
+    if (updates.externalLinks) {
+      updates.externalLinks = typeof updates.externalLinks === 'string' 
+        ? JSON.parse(updates.externalLinks) 
+        : updates.externalLinks;
+    }
+
+    const updatedCourse = await Course.findByIdAndUpdate(id, updates, { new: true });
+
+    res.json({
+      message: "Course updated successfully",
+      course: updatedCourse
+    });
+  } catch (err) {
+    console.error("UPDATE ERROR 👉", err);
+    res.status(500).json({ message: "Course update failed" });
+  }
+};
+

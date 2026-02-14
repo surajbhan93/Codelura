@@ -1,7 +1,9 @@
 import Blog from "../../models/Blog.js";
 import BlogAnalytics from "../../models/BlogAnalytics.js";
 import { generateSlug } from "../../utils/slugify.js";
+import { calculateReadingTime } from "../../utils/readingTime.js";
 import TurndownService from "turndown";
+
 /**
  * CREATE BLOG (ADVANCED CMS LEVEL)
  */
@@ -26,8 +28,7 @@ export const createBlog = async (req, res) => {
 
       isFeatured,
       allowComments,
-      readingTime,
-
+      
       publishNow
     } = req.body;
 
@@ -54,6 +55,9 @@ export const createBlog = async (req, res) => {
      // 🔁 HTML → Markdown (API level = BEST)
     const turndown = new TurndownService();
     const contentMarkdown = turndown.turndown(content);
+
+    // 🕒 Reading Time logic (Automated)
+    const readingTime = calculateReadingTime(contentMarkdown);
 
     // 🕒 Publish logic
     const isPublished = publishNow === true;
@@ -167,3 +171,75 @@ export const getPopularBlogs = async (req, res) => {
     });
   }
 };
+
+/**
+ * UPDATE BLOG
+ */
+export const updateBlog = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const updates = req.body;
+
+    const blog = await Blog.findById(id);
+    if (!blog) {
+      return res.status(404).json({ message: "Blog not found" });
+    }
+
+    // 🔗 If title changes, update slug (unless custom slug provided)
+    if (updates.title && !updates.slug && updates.title !== blog.title) {
+      updates.slug = generateSlug(updates.title);
+    } else if (updates.slug) {
+      updates.slug = generateSlug(updates.slug);
+    }
+
+    // 🔁 If HTML content changes, update Markdown and Reading Time
+    if (updates.content) {
+      const turndown = new TurndownService();
+      updates.contentMarkdown = turndown.turndown(updates.content);
+      updates.readingTime = calculateReadingTime(updates.contentMarkdown);
+      // Synchronize contentHtml if it's named content in request
+      updates.contentHtml = updates.content;
+    }
+
+    // 🕒 Handle publishing
+    if (updates.publishNow === true) {
+      updates.isPublished = true;
+      updates.publishedAt = blog.publishedAt || new Date();
+    } else if (updates.publishNow === false) {
+      updates.isPublished = false;
+    }
+
+    const updatedBlog = await Blog.findByIdAndUpdate(id, updates, { new: true });
+
+    res.json({
+      message: "Blog updated successfully",
+      blog: updatedBlog
+    });
+  } catch (error) {
+    console.error("Update blog error:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+/**
+ * DELETE BLOG
+ */
+export const deleteBlog = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const blog = await Blog.findByIdAndDelete(id);
+    if (!blog) {
+      return res.status(404).json({ message: "Blog not found" });
+    }
+
+    // 🗑️ Clean up analytics
+    await BlogAnalytics.deleteMany({ blogId: id });
+
+    res.json({ message: "Blog deleted successfully" });
+  } catch (error) {
+    console.error("Delete blog error:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+

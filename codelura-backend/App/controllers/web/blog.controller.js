@@ -11,13 +11,23 @@ export const getAllBlogs = async (req, res) => {
       page = 1,
       limit = 9,
       category,
-      tag
+      tag,
+      search
     } = req.query;
 
     const query = { isPublished: true };
 
     if (category) query.category = category;
     if (tag) query.tags = tag;
+    
+    // 🔍 Search Logic
+    if (search) {
+      query.$or = [
+        { title: { $regex: search, $options: "i" } },
+        { excerpt: { $regex: search, $options: "i" } },
+        { content: { $regex: search, $options: "i" } }
+      ];
+    }
 
     const blogs = await Blog.find(query)
       .select(

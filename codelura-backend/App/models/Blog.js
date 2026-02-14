@@ -30,7 +30,8 @@ const blogSchema = new mongoose.Schema(
     allowComments: { type: Boolean, default: true },
      // TIME
     readingTime: String,
-    publishedAt: Date
+    publishedAt: Date,
+    summary: String // AI generated summary
   },
   { timestamps: true }
 );
