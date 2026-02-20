@@ -28,6 +28,7 @@ const blogSchema = new mongoose.Schema(
     isPublished: { type: Boolean, default: false },
     isFeatured: { type: Boolean, default: false },
     allowComments: { type: Boolean, default: true },
+    summary: String,
      // TIME
     readingTime: String,
     publishedAt: Date
