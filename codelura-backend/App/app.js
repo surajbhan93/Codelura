@@ -6,6 +6,8 @@ import adminBlogRoutes from "./routes/admin.blog.routes.js";
 import authRoutes from "./routes/authRoutes.js";
 import adminCourseRoutes from "./routes/admin/course.admin.routes.js";
 import courseRoutes from "./routes/web/course.routes.js";
+import aiRoutes from "./routes/ai.routes.js";
+import hackathonRoutes from "./routes/hackathonRoutes.js";
 
 import cors from "cors";
 const app = express();
@@ -41,4 +43,6 @@ app.use("/api/admin/blogs", adminBlogRoutes);
 // 📚 COURSES / NOTES (NEW)
 app.use("/api/admin", adminCourseRoutes);
 app.use("/api", courseRoutes);
+app.use("/api/ai", aiRoutes);
+app.use("/api/hackathon", hackathonRoutes);
 export default app;

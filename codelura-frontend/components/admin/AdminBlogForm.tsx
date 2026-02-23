@@ -14,6 +14,8 @@ import {
   Badge
 } from "flowbite-react";
 import { motion } from "framer-motion";
+import { Sparkles } from "lucide-react";
+import BlogSummary from "@/components/blog/BlogSummary";
 // import RichTextEditor from "@/components/admin/RichTextEditor";
 
 export default function AdminBlogForm({
@@ -158,7 +160,63 @@ const ReactQuill = dynamic(() => import("react-quill"), {
     </div>
   )}
 </Card>
+{/* AI ASSISTANT */}
+<Card className="bg-gradient-to-br from-slate-950 to-indigo-950 border border-indigo-500/30 shadow-indigo-500/10">
+  <div className="flex items-center justify-between mb-4">
+    <div className="flex items-center gap-2">
+      <div className="p-1.5 bg-indigo-600 rounded text-white">
+        <Sparkles size={16} />
+      </div>
+      <h2 className="text-lg font-semibold text-white">AI Assistant</h2>
+    </div>
+    <Badge color="indigo">Gemini 2.0</Badge>
+  </div>
 
+  <div className="space-y-4">
+    <div className="flex flex-col sm:flex-row gap-3">
+      <Button
+        size="sm"
+        outline
+        gradientDuoTone="purpleToBlue"
+        onClick={async () => {
+          if (!form.content || form.content.split(/\s+/).length < 200) {
+            toast.error("Content must be at least 200 words for AI summary.");
+            return;
+          }
+          try {
+            setLoading(true);
+            const { data } = await api.post("/ai/blog-summary", {
+              content: form.content,
+              blogId: blogId,
+              force: true
+            });
+            setForm({ ...form, summary: data.summary });
+            toast.success("AI Summary generated! ✨");
+          } catch (err: any) {
+            toast.error(err.response?.data?.message || "AI Error");
+          } finally {
+            setLoading(false);
+          }
+        }}
+        disabled={loading}
+      >
+        <Sparkles size={14} className="mr-2" />
+        Generate AI Summary
+      </Button>
+    </div>
+
+    {form.summary && (
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="p-3 bg-white/5 border border-white/10 rounded-lg"
+      >
+        <p className="text-xs text-indigo-300 font-bold mb-1 uppercase tracking-tighter">Current Summary:</p>
+        <p className="text-sm text-slate-300 italic">"{form.summary}"</p>
+      </motion.div>
+    )}
+  </div>
+</Card>
 
 
 
