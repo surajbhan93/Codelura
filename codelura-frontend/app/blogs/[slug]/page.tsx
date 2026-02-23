@@ -1,4 +1,5 @@
 import api from "@/lib/api";
+import BlogSummary from "@/components/blog/BlogSummary";
 
 export async function generateMetadata({ params }: any) {
   const { data } = await api.get(`/blogs/${params.slug}`);
@@ -15,11 +16,13 @@ export default async function BlogDetail({ params }: any) {
     <article className="max-w-3xl mx-auto p-6">
       <img src={blog.coverImage} className="rounded mb-4" />
       <h1 className="text-3xl font-bold">{blog.title}</h1>
-      <p className="text-gray-500">
+      <p className="text-gray-500 mb-4">
         {blog.authorName} · {blog.readingTime}
       </p>
 
-      <div dangerouslySetInnerHTML={{ __html: blog.content }} />
+      <BlogSummary summary={blog.summary} />
+
+      <div dangerouslySetInnerHTML={{ __html: blog.content }} className="prose dark:prose-invert max-w-none" />
 
       <div className="mt-6 flex gap-2">
         {blog.tags.map((tag: string) => (
