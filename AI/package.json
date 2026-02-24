@@ -1,0 +1,16 @@
+
+{
+  "name": "ai-submission-classifier",
+  "version": "1.0.0",
+  "description": "AI-based Hackathon Submission Classifier with fallback and caching",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "dotenv": "^16.4.5",
+    "openai": "^4.0.0"
+  }
+}
