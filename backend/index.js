@@ -2,6 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const fs = require("fs");
 const path = require("path");
+const qualityRoutes = require("./qualityChecker");
 require("dotenv").config();
 
 const initSqlJs = require("sql.js");
@@ -9,6 +10,7 @@ const initSqlJs = require("sql.js");
 const app = express();
 app.use(cors());
 app.use(express.json());
+app.use("/api/quality", qualityRoutes);
 
 const DB_PATH = path.join(__dirname, "codelura.db");
 
