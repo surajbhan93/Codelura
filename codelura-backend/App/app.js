@@ -6,7 +6,8 @@ import adminBlogRoutes from "./routes/admin.blog.routes.js";
 import authRoutes from "./routes/authRoutes.js";
 import adminCourseRoutes from "./routes/admin/course.admin.routes.js";
 import courseRoutes from "./routes/web/course.routes.js";
-
+import orchestratorRoutes from "./routes/orchestrator.routes.js";
+import adminAIRoutes from "./routes/admin.ai.routes.js";
 import cors from "cors";
 const app = express();
 
@@ -23,6 +24,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 // COOKIE PARSER (YAHAN ADD KARNA HAI)
 app.use(cookieParser());
+app.use("/api/ai", orchestratorRoutes);
+app.use("/api/admin", adminAIRoutes);
 // Test routes
 app.get("/", (req, res) => {
   res.send("Backend is running 🚀");
