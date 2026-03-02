@@ -7,6 +7,7 @@ import authRoutes from "./routes/authRoutes.js";
 import adminCourseRoutes from "./routes/admin/course.admin.routes.js";
 import courseRoutes from "./routes/web/course.routes.js";
 import aiRoutes from "./routes/web/ai.routes.js";
+import aiUsageRoutes from "./routes/web/aiUsage.routes.js";
 
 import cors from "cors";
 const app = express();
@@ -41,4 +42,6 @@ app.use("/api/admin", adminCourseRoutes);
 app.use("/api", courseRoutes);
 // 🔍 AI SEMANTIC SEARCH
 app.use("/ai", aiRoutes);
+// Register route
+app.use("/api/ai", aiUsageRoutes);
 export default app;
