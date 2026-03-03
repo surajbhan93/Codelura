@@ -10,7 +10,9 @@ import {
   HiOutlineChatAlt2,
   HiOutlineTrendingUp,
   HiOutlineLogout,
-  HiOutlineMenu
+  HiOutlineMenu,
+  HiOutlineCollection,
+  HiOutlineClipboardList
 } from "react-icons/hi";
 import { useState } from "react";
 
@@ -19,6 +21,21 @@ const menu = [
     name: "Dashboard",
     href: "/admin",
     icon: HiOutlineViewGrid
+  },
+  {
+    name: "Hackathons",
+    href: "/admin/hackathons",
+    icon: HiOutlineCollection
+  },
+  {
+    name: "Create Hackathon",
+    href: "/admin/hackathons/create",
+    icon: HiOutlinePlusCircle
+  },
+  {
+    name: "AI Usage",
+    href: "/admin/ai-usage",
+    icon: HiOutlineClipboardList
   },
   {
     name: "All Blogs",
@@ -48,6 +65,7 @@ export default function AdminSidebar() {
 
   const logout = () => {
     localStorage.removeItem("token");
+    localStorage.removeItem("role");
     window.location.href = "/auth/login";
   };
 
@@ -116,21 +134,14 @@ export default function AdminSidebar() {
         <button
           onClick={() => setOpen(true)}
           className="text-gray-600 dark:text-gray-300"
+          aria-label="Open admin navigation"
         >
           <HiOutlineMenu className="text-2xl" />
         </button>
       </div>
 
       {/* DESKTOP SIDEBAR */}
-      <aside
-        className="
-          hidden md:flex
-          w-64 h-screen
-          bg-white dark:bg-[#0f1220]
-          border-r border-gray-200 dark:border-white/10
-          sticky top-0
-        "
-      >
+      <aside className="hidden md:flex w-64 h-screen bg-white dark:bg-[#0f1220] border-r border-gray-200 dark:border-white/10 sticky top-0">
         {SidebarContent}
       </aside>
 
@@ -147,12 +158,7 @@ export default function AdminSidebar() {
         initial={{ x: "-100%" }}
         animate={{ x: open ? 0 : "-100%" }}
         transition={{ type: "spring", stiffness: 260, damping: 30 }}
-        className="
-          fixed z-50 top-0 left-0 h-full w-64
-          bg-white dark:bg-[#0f1220]
-          border-r border-gray-200 dark:border-white/10
-          md:hidden
-        "
+        className="fixed z-50 top-0 left-0 h-full w-64 bg-white dark:bg-[#0f1220] border-r border-gray-200 dark:border-white/10 md:hidden"
       >
         {SidebarContent}
       </motion.aside>

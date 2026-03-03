@@ -33,10 +33,13 @@ export default function LoginPage() {
       }
     );
 
-    const { user } = res.data;
+    const { user, token } = res.data;
 
     // 🔥 ROLE STORE KARO (navbar ke liye)
     localStorage.setItem("role", user.role);
+    if (token) {
+      localStorage.setItem("token", token);
+    }
 
     toast.success("Welcome back to Codelura 🚀");
 
@@ -47,8 +50,9 @@ export default function LoginPage() {
       window.location.href = "/";
     }
 
-  } catch (err: any) {
-    toast.error(err.response?.data?.message || "Login failed");
+  } catch (err: unknown) {
+    const e = err as { response?: { data?: { message?: string } } };
+    toast.error(e?.response?.data?.message || "Login failed");
   }
 };
 

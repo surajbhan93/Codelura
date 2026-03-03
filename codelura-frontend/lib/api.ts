@@ -44,8 +44,19 @@ const api = axios.create({
   },
 });
 
-// ❌ REQUEST INTERCEPTOR SE TOKEN HATA DIYA
-// Cookies automatically send hongi
+// ✅ REQUEST INTERCEPTOR – add token if present
+// - Backend supports cookies AND JWT token (sent on login).
+// - Admin routes should not call APIs without a token.
+api.interceptors.request.use((config) => {
+  if (typeof window !== "undefined") {
+    const token = window.localStorage.getItem("token");
+    if (token) {
+      config.headers = config.headers ?? {};
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+  }
+  return config;
+});
 
 // RESPONSE INTERCEPTOR
 api.interceptors.response.use(
@@ -54,10 +65,9 @@ api.interceptors.response.use(
     if (err.response?.status === 401) {
       toast.error("Session expired. Please login again.");
 
-      // ❌ localStorage clear mat karo (use hi nahi ho raha)
-      // ❌ window.location direct use mat karo (Next.js)
-
       if (typeof window !== "undefined") {
+        window.localStorage.removeItem("token");
+        window.localStorage.removeItem("role");
         window.location.replace("/auth/login");
       }
     }
